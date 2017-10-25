@@ -2,6 +2,7 @@ package edu.cnm.deepdive.ca.rps.controllers;
 
 import edu.cnm.deepdive.ca.rps.models.Terrain;
 import edu.cnm.deepdive.ca.rps.models.Terrain.Neighborhood;
+import edu.cnm.deepdive.ca.rps.util.Constants;
 import edu.cnm.deepdive.ca.rps.views.TerrainView;
 import edu.cnm.deepdive.ca.rps.views.Timer;
 import java.awt.event.ActionEvent;
@@ -15,10 +16,11 @@ import javafx.scene.control.Slider;
 
 public class Controller {
 
-  private static final int DEFAULT_RUNNER_THREAD_REST = 20;
+
   @FXML
   TerrainView terrainView;
-
+  @FXML
+  Slider mixingSlider;
   @FXML
   Slider speedSlider;
   @FXML
@@ -36,7 +38,7 @@ public class Controller {
   private Timer timer;
   private boolean running = false;
   private Terrain terrain;
-  private int runnerThreadRest = DEFAULT_RUNNER_THREAD_REST;
+  private int runnerThreadRest = Constants.DEFAULT_RUNNER_THREAD_REST;
 
   @FXML
   private void initialize() {
@@ -44,13 +46,21 @@ public class Controller {
       @Override
       public void changed(ObservableValue<? extends Number> observable, Number oldValue,
           Number newValue) {
-        runnerThreadRest = (int) Math.round(10 / newValue.doubleValue());
+        runnerThreadRest = (int) Math.round(Constants.THREAD_INTERVAL / newValue.doubleValue());
+
+      }
+    });
+      mixingSlider.valueProperty().addListener(new ChangeListener<Number>() {
+      @Override
+      public void changed(ObservableValue<? extends Number> observable, Number oldValue,
+          Number newValue) {
+        terrain.setMixing(newValue.intValue());
 
       }
     });
     timer = new Timer(terrainView);
     terrain = new Terrain();
-    terrain.setSize(100);
+    terrain.setSize(Constants.MODEL_SIZE);
     resetModel();
 
   }
@@ -101,7 +111,7 @@ public class Controller {
 
   public void setBundle(ResourceBundle bundle) {
     this.bundle = bundle;
-    String neighborhoodChoices = bundle.getString("neighborhoodChoices");
+    String neighborhoodChoices = bundle.getString(Constants.NEIGHBORHOOD_CHOICES_KEY);
     String choices[] = neighborhoodChoices.split("\\|");
     this.neighborhoodChoices = new Neighborhood[choices.length];
     for (int i = 0; i < choices.length; i++) {

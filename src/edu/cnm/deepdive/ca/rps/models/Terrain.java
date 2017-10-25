@@ -1,5 +1,6 @@
 package edu.cnm.deepdive.ca.rps.models;
 
+import edu.cnm.deepdive.ca.rps.util.Constants;
 import java.util.Random;
 
 /**
@@ -22,19 +23,20 @@ import java.util.Random;
 public class Terrain {
 
   /** Default height and width of square lattice. */
-  public static final int DEFAULT_SIZE = 50;
+
   /** Default number of iterationsPerStep performed in each high-level step of the system. */
-  public static final int DEFAULT_ITERATIONS_PER_STEP = 500;
+
   /** Default neighborhood type used in selecting pairs of adjacent {@link Breed} instances. */
   public static final Neighborhood DEFAULT_NEIGHBORHOOD = Neighborhood.VON_NEUMANN;
 
   private Breed[][] cells = null;
   private Random rng = new Random();
-  private int size = DEFAULT_SIZE;
+  private int size = Constants.DEFAULT_SIZE;
   private Neighborhood neighborhood = DEFAULT_NEIGHBORHOOD;
-  private int iterationsPerStep = DEFAULT_ITERATIONS_PER_STEP;
+  private int iterationsPerStep = Constants.DEFAULT_ITERATIONS_PER_STEP;
   private int steps;
   private long totalIterations;
+  private int mixing;
 
   /**
    * Create the lattice and initialize it by assigning a random instance of {@link Breed} to each
@@ -61,8 +63,17 @@ public class Terrain {
       initialize();
 
     }
-    //Terrain.DEFAULT_ITERATIONS_PER_STEP
-    // TODO MIXING
+//TODO insert for loop for mixing
+    if (getMixing() > Constants.DEFAULT_MIXING_RATE) {
+        for (int i = 0; i < getMixing(); i++  ) {
+         int[] firstPick = randomCell();
+          int[] secondPick = randomCell();
+          Breed intermediate = cells[firstPick[0]][firstPick[1]];
+          cells[firstPick[0]][firstPick[1]] = cells[secondPick[0]][secondPick[1]];
+          cells[secondPick[0]][secondPick[1]] = intermediate;
+        }
+    }
+
     for (int i = 0; i < iterationsPerStep; i++) {
       combat();
     }
@@ -247,4 +258,11 @@ public class Terrain {
 
   }
 
+  public int getMixing() {
+    return mixing;
+  }
+
+  public void setMixing(int mixing) {
+    this.mixing = mixing;
+  }
 }
